@@ -5,9 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
 import { JWT_SECRET } from 'src/config';
-import { UserResponse } from './types/userResponse.interface';
+import { UserResponseInterface } from './types/userResponse.interface';
 import { LoginUserDto } from './dto/loginUser.dto';
 import { compare } from 'bcrypt';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UserService {
@@ -38,6 +39,10 @@ export class UserService {
     return await this.userRepository.save(newUser);
   }
 
+  async findById(id: number): Promise<UserEntity> {
+    return await this.userRepository.findOne({ where: { id } });
+  }
+
   async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
     const { email, password } = loginUserDto;
     const user = await this.userRepository.findOne({
@@ -65,6 +70,16 @@ export class UserService {
     return user;
   }
 
+  async updateUser(
+    userId: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    const user = await this.findById(userId);
+
+    Object.assign(user, updateUserDto);
+    return await this.userRepository.save(user);
+  }
+
   generateJWT(user: UserEntity): string {
     return sign(
       {
@@ -76,7 +91,7 @@ export class UserService {
     );
   }
 
-  buildUserResponse(user: UserEntity): UserResponse {
+  buildUserResponse(user: UserEntity): UserResponseInterface {
     return {
       user: { ...user, token: this.generateJWT(user) },
     };
