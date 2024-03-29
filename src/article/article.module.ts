@@ -4,9 +4,12 @@ import { ArticleService } from './article.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArticleEntity } from './article.entity';
 import { UserEntity } from 'src/user/user.entity';
+import { FollowEntity } from 'src/profile/entities/follow.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArticleEntity, UserEntity])],
+  imports: [
+    TypeOrmModule.forFeature([ArticleEntity, UserEntity, FollowEntity]),
+  ],
   controllers: [ArticleController],
   providers: [ArticleService],
 })
